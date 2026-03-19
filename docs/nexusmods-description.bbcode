@@ -1,0 +1,85 @@
+[size=5][b]RoadsideMorePlayers[/b][/size]
+
+A BepInEx mod for [b]Roadside Research[/b] that increases the maximum player count beyond the default 4-player limit.
+
+[size=4][b]Features[/b][/size]
+[list]
+[*]Configurable max player count (default: 8, up to 32)
+[*]Host-only enforcement — only the host needs the mod for networking to work
+[*]Patches both Photon Fusion session limits and Steam lobby size
+[*]Config file generated on first run for easy adjustment
+[/list]
+
+[size=4][b]Requirements[/b][/size]
+[list]
+[*][url=https://builds.bepinex.dev/projects/bepinex_be]BepInEx 6.0.0-be.755[/url] (Unity IL2CPP, win-x64)
+[*]Roadside Research (Steam)
+[/list]
+
+[size=4][b]Installation[/b][/size]
+
+[size=3][b]Option A: Bundled Install (Easiest)[/b][/size]
+
+[list=1]
+[*]Download the [b]BepInEx Bundle[/b] zip from the Files tab
+[*]Extract the entire ZIP into your Roadside Research game folder (where [font=Courier New]Roadside Research.exe[/font] is)
+[*][b]Linux/Steam Deck users:[/b] Add this to the game's Steam Launch Options:
+[code]WINEDLLOVERRIDES="winhttp=n,b" %command%[/code]
+[*]Launch the game
+[/list]
+
+[size=3][b]Option B: Manual Install (if you already have BepInEx)[/b][/size]
+
+[list=1]
+[*]Download [font=Courier New]BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.755+3fab71a.zip[/font] from [url=https://builds.bepinex.dev/projects/bepinex_be]BepInEx Bleeding Edge Builds[/url]
+[*]Extract the ZIP into your Roadside Research game folder
+[*][b]Linux/Steam Deck users:[/b] Add this to the game's Steam Launch Options:
+[code]WINEDLLOVERRIDES="winhttp=n,b" %command%[/code]
+[*]Launch the game once and close it. This generates the required config and interop files.
+[*]Edit [font=Courier New]BepInEx/config/BepInEx.cfg[/font] and set [font=Courier New]UnityLogListening = false[/font] under [font=Courier New][Logging][/font] (required for Unity 6 compatibility)
+[*]Download [font=Courier New]RoadsideMorePlayers.dll[/font] from the Files tab
+[*]Place it in [font=Courier New]BepInEx/plugins/RoadsideMorePlayers/[/font] inside your game folder
+[*]Launch the game
+[/list]
+
+[size=4][b]Configuration[/b][/size]
+
+After the first launch with the mod installed, a config file is generated at:
+[code]BepInEx/config/com.github.RoadsideMorePlayers.cfg[/code]
+
+[code][General]
+
+## The maximum number of players allowed in a lobby. Only applies when you are the host. Vanilla default is 4.
+## Acceptable value range: From 2 to 32
+MaxPlayers = 8[/code]
+
+Change [font=Courier New]MaxPlayers[/font] to your desired value and relaunch the game.
+
+[size=4][b]How It Works[/b][/size]
+
+The mod uses HarmonyX to patch two methods at runtime:
+
+[list=1]
+[*][b]NetworkRunner.StartGame(StartGameArgs)[/b] — Overrides the PlayerCount field in Photon Fusion's session creation args when hosting
+[*][b]SteamMatchmaking.CreateLobby(ELobbyType, int)[/b] — Overrides the cMaxMembers parameter when the host creates a Steam lobby
+[/list]
+
+Both patches only apply when you are the host. Clients joining your lobby do not need the mod installed (though it's recommended for the best experience).
+
+[size=4][b]Known Limitations[/b][/size]
+[list]
+[*]High player counts (>16) may cause instability with voice chat, UI, or game logic
+[*]The game's lobby UI may not display more than 4 player slots
+[*]The game may have exactly 4 spawn points — extra players might spawn in unexpected locations
+[*]Game updates may break the mod if the developer changes method signatures
+[/list]
+
+[size=4][b]Source Code[/b][/size]
+
+[url=https://github.com/darkharasho/RoadsideMorePlayers]GitHub Repository[/url]
+
+[size=4][b]Credits[/b][/size]
+[list]
+[*]Built with [url=https://github.com/BepInEx/BepInEx]BepInEx[/url] and [url=https://github.com/BepInEx/HarmonyX]HarmonyX[/url]
+[*]Inspired by [url=https://github.com/zelofi/MorePlayers]MorePlayers for R.E.P.O.[/url]
+[/list]
