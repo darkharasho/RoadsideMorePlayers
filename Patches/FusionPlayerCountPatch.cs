@@ -15,8 +15,13 @@ public static class FusionPlayerCountPatch
     {
         var maxPlayers = Plugin.MaxPlayers.Value;
 
-        // Only override when hosting
-        if (args.GameMode == GameMode.Host || args.GameMode == GameMode.Server)
+        // Override for any mode that can result in hosting
+        // The game uses AutoHostOrClient, which means Fusion decides — but the
+        // PlayerCount is set at session creation time regardless of mode
+        if (args.GameMode == GameMode.Host
+            || args.GameMode == GameMode.Server
+            || args.GameMode == GameMode.AutoHostOrClient
+            || args.GameMode == GameMode.Shared)
         {
             var original = args.PlayerCount;
             args.PlayerCount = new Il2CppSystem.Nullable<int>(maxPlayers);
