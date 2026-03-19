@@ -1,0 +1,82 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>RoadsideMorePlayers</AssemblyName>
+    <RootNamespace>RoadsideMorePlayers</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GameDir>$(HOME)/.local/share/Steam/steamapps/common/Roadside Research</GameDir>
+    <BepInExDir>$(GameDir)/BepInEx</BepInExDir>
+    <InteropDir>$(BepInExDir)/interop</InteropDir>
+    <CoreDir>$(BepInExDir)/core</CoreDir>
+  </PropertyGroup>
+
+  <!-- BepInEx core -->
+  <ItemGroup>
+    <Reference Include="BepInEx.Core">
+      <HintPath>$(CoreDir)/BepInEx.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP">
+      <HintPath>$(CoreDir)/BepInEx.Unity.IL2CPP.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Unity.Common">
+      <HintPath>$(CoreDir)/BepInEx.Unity.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(CoreDir)/0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>$(CoreDir)/Il2CppInterop.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- IL2CPP interop assemblies -->
+  <ItemGroup>
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>$(InteropDir)/Il2Cppmscorlib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Fusion.Runtime">
+      <HintPath>$(InteropDir)/Fusion.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Fusion.Unity">
+      <HintPath>$(InteropDir)/Fusion.Unity.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="com.rlabrecque.steamworks.net">
+      <HintPath>$(InteropDir)/com.rlabrecque.steamworks.net.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="WallyBox">
+      <HintPath>$(InteropDir)/WallyBox.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(InteropDir)/Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(InteropDir)/UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Copy output to BepInEx plugins folder -->
+  <Target Name="CopyToPlugins" AfterTargets="Build">
+    <Copy SourceFiles="$(OutputPath)/$(AssemblyName).dll"
+          DestinationFolder="$(BepInExDir)/plugins/RoadsideMorePlayers/"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

@@ -1,0 +1,92 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Download BepInEx for build references
+        run: |
+          BEPINEX_URL="https://builds.bepinex.dev/projects/bepinex_be/755/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.755%2B3fab71a.zip"
+          mkdir -p /tmp/bepinex-ref/BepInEx
+          curl -L -o /tmp/bepinex.zip "$BEPINEX_URL"
+          unzip -q /tmp/bepinex.zip -d /tmp/bepinex-ref
+
+      - name: Download interop stubs
+        run: |
+          echo "⚠️ CI builds require pre-built interop assembly stubs."
+          echo "For now, this workflow expects them in the 'lib/' directory."
+          echo "See README for instructions on generating them."
+          # If lib/ directory exists with stubs, use those
+          if [ -d "lib" ]; then
+            echo "Found lib/ directory with reference assemblies"
+          else
+            echo "ERROR: No lib/ directory found. CI builds need interop stubs."
+            echo "Run the game locally with BepInEx to generate them,"
+            echo "then copy the needed DLLs to lib/ and commit."
+            exit 1
+          fi
+
+      - name: Build
+        run: |
+          dotnet build -c Release \
+            -p:BepInExDir=/tmp/bepinex-ref/BepInEx \
+            -p:InteropDir=${{ github.workspace }}/lib \
+            -p:CoreDir=/tmp/bepinex-ref/BepInEx/core
+
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Package mod-only
+        run: |
+          mkdir -p dist/mod-only/BepInEx/plugins/RoadsideMorePlayers
+          cp bin/Release/net6.0/RoadsideMorePlayers.dll dist/mod-only/BepInEx/plugins/RoadsideMorePlayers/
+          cd dist/mod-only && zip -r ../RoadsideMorePlayers-v${{ steps.version.outputs.version }}.zip .
+
+      - name: Package bundled with BepInEx
+        run: |
+          mkdir -p dist/bundled
+          unzip -q /tmp/bepinex.zip -d dist/bundled
+          mkdir -p dist/bundled/BepInEx/plugins/RoadsideMorePlayers
+          cp bin/Release/net6.0/RoadsideMorePlayers.dll dist/bundled/BepInEx/plugins/RoadsideMorePlayers/
+          mkdir -p dist/bundled/BepInEx/config
+          echo -e "[Logging]\n\nUnityLogListening = false" > dist/bundled/BepInEx/config/BepInEx.cfg
+          cd dist/bundled && zip -r ../RoadsideMorePlayers-v${{ steps.version.outputs.version }}-BepInEx-Bundle.zip .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: RoadsideMorePlayers v${{ steps.version.outputs.version }}
+          body: |
+            ## RoadsideMorePlayers v${{ steps.version.outputs.version }}
+
+            Increases the max player count in Roadside Research beyond 4.
+
+            ### Downloads
+
+            - **`RoadsideMorePlayers-v${{ steps.version.outputs.version }}.zip`** — Mod only (requires BepInEx already installed)
+            - **`RoadsideMorePlayers-v${{ steps.version.outputs.version }}-BepInEx-Bundle.zip`** — Everything included (extract into game folder and play)
+
+            ### Bundled Install (Easiest)
+            1. Extract the BepInEx Bundle zip into your Roadside Research game folder
+            2. **Linux/Steam Deck:** Add `WINEDLLOVERRIDES="winhttp=n,b" %command%` to Steam launch options
+            3. Launch the game
+
+            ### Configuration
+            After first launch, edit `BepInEx/config/com.github.RoadsideMorePlayers.cfg` to change max players (default: 8).
+          files: |
+            dist/RoadsideMorePlayers-v${{ steps.version.outputs.version }}.zip
+            dist/RoadsideMorePlayers-v${{ steps.version.outputs.version }}-BepInEx-Bundle.zip
