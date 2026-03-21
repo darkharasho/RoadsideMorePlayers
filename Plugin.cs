@@ -11,7 +11,7 @@ public class Plugin : BasePlugin
 {
     public const string PluginGuid = "com.github.RoadsideMorePlayers";
     public const string PluginName = "RoadsideMorePlayers";
-    public const string PluginVersion = "1.0.0";
+    public const string PluginVersion = "1.1.0";
 
     public static ManualLogSource Logger { get; private set; }
     public static ConfigEntry<int> MaxPlayers { get; private set; }
@@ -37,6 +37,7 @@ public class Plugin : BasePlugin
         _harmony = new Harmony(PluginGuid);
         _harmony.PatchAll(typeof(Patches.FusionPlayerCountPatch));
         _harmony.PatchAll(typeof(Patches.SteamLobbyPatch));
+        _harmony.PatchAll(typeof(Patches.VoicePermissionPatch));
 
         Logger.LogInfo("All patches applied successfully.");
     }
