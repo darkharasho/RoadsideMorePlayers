@@ -1,0 +1,18 @@
+{
+  "$schema": "https://hml-share.project96.workers.dev/v1/catalog/schema.json",
+  "schema": 1,
+  "mods": [
+    {
+      "id": "more-players",
+      "name": "RoadsideMorePlayers",
+      "description": "Raises the Roadside Research lobby cap above 4 players.",
+      "games": [
+        "roadside-research"
+      ],
+      "assetPattern": "RoadsideMorePlayers-v{version}.zip",
+      "dependencies": [
+        "BepInEx-BepInExPack_IL2CPP-6.0.788"
+      ]
+    }
+  ]
+}
